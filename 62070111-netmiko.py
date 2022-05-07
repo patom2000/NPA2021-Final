@@ -8,36 +8,43 @@ device_param = {'device_type': "cisco_ios",
                 'username': username,
                 'password': password}
 
-config_loopback = ["int loopback 62070111", "ip address 192.168.1.1 255.255.255.0"]
-delete_loopback = ["no int loopback 62070111"]
+config_loopback_command = ["int loopback 62070111", "ip address 192.168.1.1 255.255.255.0"]
+delete_loopback_command = ["no int loopback 62070111"]
 
 def sendloopbackcommand(device, command):
     with ConnectHandler(**device) as ssh:
         result = ssh.send_config_set(command)
-        result = output_text_to_list(ssh.send_command("sh ip int br"))
+        result = ssh.send_command("sh ip int br")
         print(result)
 
 def output_text_to_list(text):
     return text.strip().split("\n")
 
-def check_loopback(device, readytodel = 0, readytoconfig = 0):
+def check_loopback(device):
     with ConnectHandler(**device) as ssh:
         result = output_text_to_list(ssh.send_command("sh ip int br"))
         result.pop(0)
         interface = result[-1].split()
-        if "Loopback" in interface[0]:
-            readytodel = 1
         if ("Loopback" in interface[0] and interface[1] == "unassigned") or "Loopback" not in interface[0]:
-            readytoconfig = 1
-        if readytoconfig:
-            ans = input("Do you want to create loopback?(Y or N): ")
-            if ans == "y" or ans == "Y":
-                sendloopbackcommand(device, config_loopback)
-            readytodel = 1
-            readytoconfig = 0
-        if readytodel:
-            ans = input("Do you want to delete loopback?(Y or N): ")
-            if ans == "y" or ans == "Y":
-                sendloopbackcommand(device, delete_loopback)
+            return 0
+        else:
+            return 1
 
-check_loopback(device_param)
+def delete_loopback(device):
+    with ConnectHandler(**device) as ssh:
+        exist = check_loopback(device)
+        if exist == 1:
+            sendloopbackcommand(device, delete_loopback_command)
+        else:
+            print("loopback is not exist")
+
+def create_loopback(device):
+    with ConnectHandler(**device) as ssh:
+        exist = check_loopback(device)
+        if exist == 0:
+            sendloopbackcommand(device, config_loopback_command)
+        else:
+            print("loopback is already exist")
+
+delete_loopback(device_param)
+create_loopback(device_param)
