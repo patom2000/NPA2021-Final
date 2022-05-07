@@ -9,14 +9,16 @@ device_param = {'device_type': "cisco_ios",
                 'password': password}
 
 config_loopback = ["int loopback 62070111", "ip address 192.168.1.1 255.255.255.0"]
+delete_loopback = ["no int loopback 62070111"]
 
-def set_loopback(device):
+def sendcommand(device):
     with ConnectHandler(**device) as ssh:
-        result = ssh.send_config_set(config_loopback)
+        result = ssh.send_config_set(delete_loopback)
         print(result)
 
-        output = ssh.send_command("sh ip int br")
-        print(output)
+        ip = ssh.send_command("sh ip int br")
+        return ip
 
+def check_loopback():
 
-set_loopback(device_param)
+sendcommand(device_param)
