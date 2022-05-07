@@ -4,7 +4,7 @@ import requests
 import json
 import time
 access_token = "NDRhM2RlNjAtOWM1Mi00MTIwLWFjZTUtZTI3MmU4OTk5ZjE5M2Y3NWQwNDktNTdh_P0A1_4a252141-f787-4173-a4c9-bde69c553a24"
-
+device = "10.0.15.105"
 headers = {
  'Authorization': f'Bearer {access_token}',
  'Content-Type': 'application/json'
@@ -32,8 +32,8 @@ def get_message(room_id):
     response_json = res.json()
     return response_json['items'][0]['text']
 
-def check_loopback_status():
-    device_ip = "10.0.15.105"
+def check_loopback_status(device_ip):
+    
     api_url = f"https://{device_ip}/restconf/data/ietf-interfaces:interfaces"
     headers = { "Accept": "application/yang-data+json", 
             "Content-type":"application/yang-data+json"
@@ -45,17 +45,17 @@ def check_loopback_status():
     name = response_json['ietf-interfaces:interfaces']['interface'][-1]['name']
     return status, name
 
-def core_bot(room_id):
+def core_bot(room_id, device_ip):
     add_message("start", room_id)
     while 1:
         time.sleep(1)
         text = get_message(room_id)
         if text == "62070111":
-            status, name = check_loopback_status()
+            status, name = check_loopback_status(device_ip)
             if status == 1:
                 add_message(f"{name} - Operational status is up", room_id)
             if status == 0:
                 add_message(f"{name} - Operational status is down", room_id)
 
 
-core_bot(main_room)
+core_bot(main_room, device)
