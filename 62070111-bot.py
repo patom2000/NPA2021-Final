@@ -58,4 +58,4 @@ def core_bot(room_id):
                 add_message(f"{name} - Operational status is down", room_id)
 
 
-core_bot(test_room)
+core_bot(main_room)
