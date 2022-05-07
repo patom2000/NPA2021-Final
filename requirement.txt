@@ -1,1 +1,7 @@
+task 2
 netmiko
+
+task 3
+requests
+json
+time
