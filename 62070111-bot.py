@@ -2,7 +2,7 @@
 import requests
 import json
 import time
-access_token = "NDRhM2RlNjAtOWM1Mi00MTIwLWFjZTUtZTI3MmU4OTk5ZjE5M2Y3NWQwNDktNTdh_P0A1_4a252141-f787-4173-a4c9-bde69c553a24"
+access_token = "ZTEyMTczNmYtYzNiYi00Y2VlLWFhZTUtNjMxZjlhNGZkOWNhNzE0NTI3MWYtNzg0_P0A1_4a252141-f787-4173-a4c9-bde69c553a24"
 device = "10.0.15.105"
 headers = {
  'Authorization': f'Bearer {access_token}',
