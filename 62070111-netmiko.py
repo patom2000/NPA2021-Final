@@ -37,6 +37,7 @@ def delete_loopback(device):
             sendloopbackcommand(device, delete_loopback_command)
         else:
             print("loopback is not exist")
+        ssh.save_config()
 
 def create_loopback(device):
     with ConnectHandler(**device) as ssh:
@@ -45,6 +46,7 @@ def create_loopback(device):
             sendloopbackcommand(device, config_loopback_command)
         else:
             print("loopback is already exist")
+        ssh.save_config()
 
 delete_loopback(device_param)
 create_loopback(device_param)
