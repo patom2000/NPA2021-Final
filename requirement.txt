@@ -1,7 +1,26 @@
-task 2
-netmiko
-
-task 3
-requests
-json
-time
+bcrypt==3.2.2
+certifi==2021.10.8
+cffi==1.15.0
+charset-normalizer==2.0.12
+cryptography==37.0.2
+future==0.18.2
+idna==3.3
+lxml==4.8.0
+monotonic==1.6
+netconf==2.1.0
+netmiko==4.1.0
+ntc-templates==3.0.0
+paramiko==2.10.4
+pyang==2.5.3
+pycparser==2.21
+PyNaCl==1.5.0
+pyserial==3.5
+PyYAML==6.0
+requests==2.27.1
+scp==0.14.4
+six==1.16.0
+sshutil==1.5.0
+tenacity==8.0.1
+textfsm==1.1.2
+urllib3==1.26.9
+yang==1.0.0
