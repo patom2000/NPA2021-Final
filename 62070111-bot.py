@@ -2,14 +2,18 @@
 import requests
 import json
 import time
-access_token = "ZjE4MmEzYzItNDAzMS00ZDlhLWI4MjctNTNhZTNmZjUyODJjMTNmNmFjMTMtOGQx_P0A1_4a252141-f787-4173-a4c9-bde69c553a24"
-device = "10.0.15.105"
+
+json_auth = json.load(open("auth.json"))
+print(json_auth)
+access_token = json_auth[0]["access_token"]
+device = json_auth[0]["device_ip"]
+basicauth = tuple(json_auth[0]["basicauth"])
 headers = {
  'Authorization': f'Bearer {access_token}',
  'Content-Type': 'application/json'
 }
-main_room = "Y2lzY29zcGFyazovL3VzL1JPT00vNjUwODkzMjAtY2QxOS0xMWVjLWE1NGUtNGQ2MmNhMWM4YmVl"
-test_room = "Y2lzY29zcGFyazovL3VybjpURUFNOnVzLXdlc3QtMl9yL1JPT00vNTg4MjliOTAtOTE5Mi0xMWVjLWI3ZjMtODFlZDdmNGJiODhm"
+main_room = json_auth[0]["main_room"]
+test_room = json_auth[0]["test_room"]
 
 def add_message(message, room_id):
     url = 'https://webexapis.com/v1/messages'
@@ -31,20 +35,19 @@ def get_message(room_id):
     response_json = res.json()
     return response_json['items'][0]['text']
 
-def check_loopback_status(device_ip):
+def check_loopback_status(device_ip, basicauth):
     
     api_url = f"https://{device_ip}/restconf/data/ietf-interfaces:interfaces"
     headers = { "Accept": "application/yang-data+json", 
             "Content-type":"application/yang-data+json"
     }
-    basicauth = ("admin", "cisco")
     resp = requests.get(api_url, auth=basicauth, headers=headers, verify=False)
     response_json = resp.json()
     status = response_json['ietf-interfaces:interfaces']['interface'][-1]['enabled']
     name = response_json['ietf-interfaces:interfaces']['interface'][-1]['name']
     return status, name
 
-def enable_loopback(device_ip):
+def enable_loopback(device_ip, basicauth):
     api_url = f"https://{device_ip}/restconf/data/ietf-interfaces:interfaces/interface=Loopback62070111"
 
     headers = { "Accept": "application/yang-data+json", 
@@ -75,19 +78,19 @@ def enable_loopback(device_ip):
     else:
         return "Enable Loopback62070111 - Now the Operational status is still down"
 
-def core_bot(room_id, device_ip):
+def core_bot(room_id, device_ip, basicauth):
     add_message("start", room_id)
     while 1:
         time.sleep(1)
         text = get_message(room_id)
         if text == "62070111":
-            status, name = check_loopback_status(device_ip)
+            status, name = check_loopback_status(device_ip, basicauth)
             if status == 1:
                 add_message(f"{name} - Operational status is up", room_id)
             if status == 0:
                 add_message(f"{name} - Operational status is down", room_id)
-                add_message(enable_loopback(device_ip), room_id)
+                add_message(enable_loopback(device_ip, basicauth), room_id)
 
 
 
-core_bot(test_room, device)
+core_bot(test_room, device, basicauth)
