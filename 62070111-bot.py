@@ -2,7 +2,7 @@
 import requests
 import json
 import time
-access_token = "ZTEyMTczNmYtYzNiYi00Y2VlLWFhZTUtNjMxZjlhNGZkOWNhNzE0NTI3MWYtNzg0_P0A1_4a252141-f787-4173-a4c9-bde69c553a24"
+access_token = "ZjE4MmEzYzItNDAzMS00ZDlhLWI4MjctNTNhZTNmZjUyODJjMTNmNmFjMTMtOGQx_P0A1_4a252141-f787-4173-a4c9-bde69c553a24"
 device = "10.0.15.105"
 headers = {
  'Authorization': f'Bearer {access_token}',
@@ -44,6 +44,37 @@ def check_loopback_status(device_ip):
     name = response_json['ietf-interfaces:interfaces']['interface'][-1]['name']
     return status, name
 
+def enable_loopback(device_ip):
+    api_url = f"https://{device_ip}/restconf/data/ietf-interfaces:interfaces/interface=Loopback62070111"
+
+    headers = { "Accept": "application/yang-data+json", 
+            "Content-type":"application/yang-data+json"
+           }
+    basicauth = ("admin", "cisco")
+    yangConfig = {
+    "ietf-interfaces:interface": {
+        "name": "Loopback62070111",
+        "type": "iana-if-type:softwareLoopback",
+        "enabled": True,
+        "ietf-ip:ipv4": {
+            "address": [
+                {
+                    "ip": "192.168.1.1",
+                    "netmask": "255.255.255.0"
+                }
+            ]
+            },
+        "ietf-ip:ipv6": {}
+        }
+    }
+
+    resp = requests.put(api_url, data=json.dumps(yangConfig), auth=basicauth, headers=headers, verify=False)
+
+    if(resp.status_code >= 200 and resp.status_code <= 299):
+        print("STATUS OK: {}".format(resp.status_code))
+    else:
+        print('Error. Status Code: {} \nError message: {}'.format(resp.status_code,resp.json()))
+
 def core_bot(room_id, device_ip):
     add_message("start", room_id)
     while 1:
@@ -55,6 +86,7 @@ def core_bot(room_id, device_ip):
                 add_message(f"{name} - Operational status is up", room_id)
             if status == 0:
                 add_message(f"{name} - Operational status is down", room_id)
+                enable_loopback(device_ip)
 
 
-core_bot(main_room, device)
+core_bot(test_room, device)
