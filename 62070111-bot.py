@@ -71,9 +71,9 @@ def enable_loopback(device_ip):
     resp = requests.put(api_url, data=json.dumps(yangConfig), auth=basicauth, headers=headers, verify=False)
 
     if(resp.status_code >= 200 and resp.status_code <= 299):
-        print("STATUS OK: {}".format(resp.status_code))
+        return "Enable Loopback62070111 - Now the Operational status is up again"
     else:
-        print('Error. Status Code: {} \nError message: {}'.format(resp.status_code,resp.json()))
+        return "Enable Loopback62070111 - Now the Operational status is still down"
 
 def core_bot(room_id, device_ip):
     add_message("start", room_id)
@@ -86,7 +86,8 @@ def core_bot(room_id, device_ip):
                 add_message(f"{name} - Operational status is up", room_id)
             if status == 0:
                 add_message(f"{name} - Operational status is down", room_id)
-                enable_loopback(device_ip)
+                add_message(enable_loopback(device_ip), room_id)
+
 
 
 core_bot(test_room, device)
